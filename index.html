@@ -3,966 +3,1006 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OmniAI — Free All-in-One AI Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>OmniAI — Admin Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   HOW TO USE IN YOUR OWN HTML PAGE:
-   1. Copy everything between the <style> tags into your CSS
-   2. Copy the <body> HTML into your page
-   3. Copy the <script> block into your JS
-   4. Fill in your API keys in the CONFIG section at the top of the script
-   ============================================================ */
-
 :root {
-  --bg: #0a0a0f;
-  --surface: #12121a;
-  --surface2: #1a1a26;
-  --border: #2a2a3a;
-  --border2: #3a3a50;
-  --accent: #6c63ff;
-  --accent2: #a78bfa;
-  --text: #f0f0ff;
-  --text2: #9090b0;
-  --text3: #5050708;
-  --green: #22c55e;
-  --radius: 12px;
+  --bg: #080b12;
+  --surface: #0e1420;
+  --surface2: #141d2e;
+  --surface3: #1a2540;
+  --border: #1e2d45;
+  --border2: #2a3f5f;
+  --accent: #00d4ff;
+  --accent2: #0099cc;
+  --gold: #f0b429;
+  --green: #00e676;
+  --red: #ff4d6d;
+  --purple: #b388ff;
+  --text: #e8f0fe;
+  --text2: #7a9cc0;
+  --text3: #4a6080;
+  --radius: 14px;
   --radius-sm: 8px;
+  --mono: 'JetBrains Mono', monospace;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
 }
-
-/* Background grid */
 body::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background-image:
-    linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  animation: gridShift 20s linear infinite;
+  pointer-events: none; z-index: 0;
+}
+@keyframes gridShift { 0%{background-position:0 0} 100%{background-position:32px 32px} }
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+.admin-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,153,204,0.04));
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.admin-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(0,212,255,0.03));
   pointer-events: none;
-  z-index: 0;
 }
-
-.app-wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.admin-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+  color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 20px;
+  margin-bottom: 1.25rem;
+}
+.admin-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.admin-header h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 700; letter-spacing: -1px; line-height: 1.2; margin-bottom: 0.75rem; }
+.admin-header h1 span { color: var(--accent); }
+.admin-header p { font-size: 15px; color: var(--text2); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
 }
-.logo {
-  width: 48px; height: 48px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  box-shadow: 0 0 30px rgba(108,99,255,0.4);
-  flex-shrink: 0;
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem 1.25rem;
+  text-align: center;
 }
-.header-text h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-.header-text p { font-size: 13px; color: var(--text2); margin-top: 3px; display: flex; align-items: center; gap: 8px; }
-.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-.provider-strip {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  margin-bottom: 2rem;
+.stat-num { font-size: 28px; font-weight: 700; font-family: var(--mono); color: var(--accent); line-height: 1; }
+.stat-label { font-size: 11px; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.section-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.5rem; margin-top: 2.5rem;
 }
-.provider-pill {
-  font-size: 11px; padding: 3px 10px; border-radius: 20px;
-  border: 1px solid var(--border2);
-  color: var(--text2);
-  display: flex; align-items: center; gap: 5px;
-}
-.provider-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
-.provider-pill.active { border-color: var(--accent); color: var(--accent2); }
-.provider-pill.failed { border-color: #ef4444; color: #ef4444; }
-.provider-pill.failed .dot { background: #ef4444; }
-
-/* Nav tabs */
-.nav {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+.section-head h2 { font-size: 18px; font-weight: 600; }
+.section-line { flex: 1; height: 1px; background: var(--border); }
+.section-tag { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.providers-grid { display: flex; flex-direction: column; gap: 16px; }
+.provider-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.nav-btn {
-  padding: 7px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px; font-family: 'DM Sans', sans-serif;
-  border: none; background: transparent;
-  cursor: pointer; color: var(--text2);
-  transition: all 0.18s; display: flex; align-items: center; gap: 6px;
+.provider-card:hover { border-color: var(--border2); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+.provider-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface);
+  transition: background 0.15s;
+}
+.provider-header:hover { background: var(--surface2); }
+.provider-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.provider-meta { flex: 1; }
+.provider-name { font-size: 15px; font-weight: 600; }
+.provider-url { font-size: 11px; color: var(--text2); font-family: var(--mono); margin-top: 2px; }
+.provider-right { display: flex; align-items: center; gap: 10px; }
+.free-badge {
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+  background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25);
   white-space: nowrap;
 }
-.nav-btn:hover { color: var(--text); background: var(--surface2); }
-.nav-btn.active { background: var(--accent); color: #fff; font-weight: 500; box-shadow: 0 0 16px rgba(108,99,255,0.4); }
-.nav-btn .icon { font-size: 15px; }
-
-/* Panels */
-.panel { display: none; flex-direction: column; gap: 14px; }
-.panel.active { display: flex; }
-
-/* Form elements */
-label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-textarea, input[type="text"], select {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
+.configured-badge {
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+  background: rgba(0,230,118,0.2); color: var(--green); border: 1px solid rgba(0,230,118,0.5);
+  white-space: nowrap;
+}
+.limit-badge {
+  font-size: 10px; padding: 3px 8px; border-radius: 4px;
+  background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.2);
+  font-family: var(--mono); white-space: nowrap;
+}
+.chevron { color: var(--text3); font-size: 12px; transition: transform 0.2s; }
+.provider-card.open .chevron { transform: rotate(180deg); }
+.provider-body {
+  display: none;
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.provider-card.open .provider-body { display: block; }
+.steps { display: flex; flex-direction: column; gap: 0; margin-top: 1rem; position: relative; }
+.steps::before {
+  content: '';
+  position: absolute; left: 17px; top: 24px; bottom: 24px; width: 1px;
+  background: linear-gradient(to bottom, var(--accent2), transparent);
+}
+.step { display: flex; gap: 14px; padding: 10px 0; position: relative; }
+.step-num {
+  width: 35px; height: 35px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: var(--mono);
+  color: var(--accent); position: relative; z-index: 1;
+}
+.step-content { flex: 1; padding-top: 6px; }
+.step-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.step-desc { font-size: 12px; color: var(--text2); line-height: 1.7; }
+.step-desc code {
+  background: rgba(0,212,255,0.1); color: var(--accent);
+  padding: 1px 6px; border-radius: 4px; font-family: var(--mono); font-size: 11px;
+}
+.step-desc a { color: var(--accent); text-decoration: none; }
+.step-desc a:hover { text-decoration: underline; }
+.note-box {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(240,180,41,0.07); border: 1px solid rgba(240,180,41,0.2);
+  border-radius: var(--radius-sm); font-size: 12px; color: #f0c060; line-height: 1.7;
+}
+.note-box strong { color: var(--gold); }
+.key-format {
+  margin-top: 10px; padding: 8px 12px;
+  background: var(--surface3); border: 1px solid var(--border2);
   border-radius: var(--radius-sm);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  padding: 10px 14px;
-  outline: none;
-  transition: border-color 0.18s;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
-select { height: 40px; cursor: pointer; }
-textarea:focus, input:focus, select:focus { border-color: var(--accent); }
-
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-/* Chip selectors */
-.chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.chip {
-  padding: 5px 14px; border-radius: 20px; font-size: 12px;
-  border: 1px solid var(--border2); cursor: pointer;
-  color: var(--text2); background: transparent;
-  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+.key-format span { color: var(--green); word-break: break-all; }
+.key-live {
+  margin-top: 8px; padding: 10px 14px;
+  background: rgba(0,230,118,0.06); border: 1px solid rgba(0,230,118,0.25);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono); font-size: 12px; color: var(--green);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-.chip:hover { border-color: var(--accent2); color: var(--accent2); }
-.chip.active { background: rgba(108,99,255,0.15); border-color: var(--accent); color: var(--accent2); }
-
-/* Buttons */
-.btn {
-  padding: 10px 22px; border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
-  border: none; background: var(--accent);
-  color: #fff; cursor: pointer;
-  transition: all 0.18s;
-  display: inline-flex; align-items: center; gap: 8px;
-  box-shadow: 0 0 20px rgba(108,99,255,0.3);
+.key-live .key-label { color: var(--text2); font-size: 11px; }
+.server-setup {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  margin-top: 2rem;
 }
-.btn:hover { background: #7c73ff; box-shadow: 0 0 28px rgba(108,99,255,0.5); transform: translateY(-1px); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.btn-sm {
-  padding: 5px 12px; font-size: 12px;
-  border-radius: 6px; border: 1px solid var(--border2);
-  background: transparent; color: var(--text2);
-  cursor: pointer; font-family: 'DM Sans', sans-serif;
+.code-block {
+  background: #040810; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 1rem 1.25rem;
+  font-family: var(--mono); font-size: 12px; color: #a8c0e0;
+  line-height: 2; overflow-x: auto; margin: 10px 0;
+  position: relative;
+}
+.code-block .comment { color: var(--text3); }
+.code-block .key-name { color: var(--accent); }
+.code-block .key-val { color: var(--green); }
+.code-block .cmd { color: var(--gold); }
+.code-block .highlight { color: var(--purple); }
+.copy-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  color: var(--text2); font-size: 10px; padding: 3px 8px;
+  border-radius: 4px; cursor: pointer; font-family: 'Outfit', sans-serif;
   transition: all 0.15s;
 }
-.btn-sm:hover { border-color: var(--accent2); color: var(--accent2); }
-
-/* Output */
-.output-wrap { position: relative; }
-.output-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  font-size: 14px; line-height: 1.85;
-  min-height: 100px; max-height: 520px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--text);
-  transition: border-color 0.2s;
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.rotation-diagram {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin-top: 1rem;
 }
-.output-box.empty { color: var(--text2); font-style: italic; }
-.output-box.loading { border-color: var(--accent); }
-
-.output-actions {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 8px; flex-wrap: wrap;
+.rotation-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 1rem;
 }
-.provider-used {
-  font-size: 11px; color: var(--text2);
-  display: flex; align-items: center; gap: 5px;
-  margin-left: auto;
+.flow-node {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border2); color: var(--text2); background: var(--surface2);
 }
-.provider-used .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
-
-/* Spinner */
-.spinner {
-  width: 15px; height: 15px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.65s linear infinite;
-  display: inline-block;
+.flow-node.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.08); }
+.flow-arrow { color: var(--text3); font-size: 14px; }
+.flow-node.fallback { border-color: var(--gold); color: var(--gold); background: rgba(240,180,41,0.06); font-size: 11px; }
+.checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px;
+  cursor: pointer; transition: border-color 0.15s;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Status */
-.status-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text2); flex-wrap: wrap; }
-.status-row .tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; }
-.tag-info { background: rgba(108,99,255,0.15); color: var(--accent2); }
-.tag-warn { background: rgba(234,179,8,0.15); color: #facc15; }
-.tag-err { background: rgba(239,68,68,0.15); color: #f87171; }
-.tag-ok { background: rgba(34,197,94,0.15); color: var(--green); }
-
-/* Config panel */
-.config-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  display: none;
+.check-item:hover { border-color: var(--border2); }
+.check-item.done { border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.04); }
+.check-box {
+  width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border2);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.15s; margin-top: 1px;
 }
-.config-panel.open { display: block; }
-.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
-.config-item label { font-size: 11px; color: var(--text2); margin-bottom: 3px; }
-.config-item input { font-size: 12px; padding: 7px 10px; height: 34px; font-family: monospace; }
-.config-header { display: flex; align-items: center; justify-content: space-between; }
-.config-header h3 { font-size: 14px; font-weight: 500; font-family: 'Syne', sans-serif; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+.check-item.done .check-box { background: var(--green); border-color: var(--green); color: #000; }
+.check-text { flex: 1; line-height: 1.5; }
+.check-text .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.progress-bar-wrap { margin-top: 1rem; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.progress-track { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 3px; transition: width 0.4s ease; }
+.env-template {
+  background: #040810; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 1rem 1.25rem;
+  font-family: var(--mono); font-size: 12px; line-height: 2.2;
+  margin-top: 10px; position: relative;
+}
+.env-line { display: flex; gap: 8px; }
+.env-key { color: var(--accent); }
+.env-eq { color: var(--text3); }
+.env-val { color: var(--green); }
+.env-comment { color: var(--text3); font-size: 11px; margin-left: auto; }
+.tab-row { display: flex; gap: 4px; margin-bottom: 1rem; background: var(--surface2); border-radius: var(--radius-sm); padding: 4px; border: 1px solid var(--border); }
+.tab { padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text2); border: none; background: transparent; font-family: 'Outfit', sans-serif; transition: all 0.15s; }
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--accent2); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.admin-footer {
+  margin-top: 3rem; padding: 1.5rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); text-align: center;
+  font-size: 13px; color: var(--text2); line-height: 2;
+}
+.admin-footer strong { color: var(--accent); }
+.keys-loaded-banner {
+  background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.3);
+  border-radius: var(--radius); padding: 1rem 1.5rem;
+  margin-bottom: 2rem; display: flex; align-items: center; gap: 12px;
+  font-size: 13px;
+}
+.keys-loaded-banner .icon { font-size: 22px; }
+.keys-loaded-banner strong { color: var(--green); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-/* Responsive */
-@media (max-width: 600px) {
-  .row2, .row3, .config-grid { grid-template-columns: 1fr; }
-  .header-text h1 { font-size: 18px; }
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .rotation-flow { gap: 5px; }
+  .flow-node { font-size: 10px; padding: 4px 10px; }
 }
 </style>
 </head>
 <body>
-<div class="app-wrap">
+<div class="wrap">
 
   <!-- HEADER -->
-  <div class="header">
-    <div class="logo">⬡</div>
-    <div class="header-text">
-      <h1>OmniAI — Free All-in-One Platform</h1>
-      <p>
-        <span class="live-dot"></span>
-        8 free providers · auto-fallback · no cost ever
-        &nbsp;·&nbsp;
-        <button class="btn-sm" onclick="toggleConfig()" style="font-size:11px;padding:3px 10px;">⚙ API Keys</button>
-      </p>
-    </div>
+  <div class="admin-header">
+    <div class="admin-badge"><span class="dot"></span> Administrator Panel</div>
+    <h1>OmniAI <span>Backend Setup</span> Guide</h1>
+    <p>Complete step-by-step instructions for registering all 8 free API providers and configuring the secure rotating backend server.</p>
   </div>
 
-  <!-- API KEY CONFIG -->
-  <div class="config-panel" id="config-panel">
-    <div class="config-header">
-      <h3>⚙ Your Free API Keys</h3>
-      <span style="font-size:11px;color:var(--text2)">Keys stay in your browser only — never sent anywhere else</span>
-    </div>
-    <div class="config-grid">
-      <div class="config-item">
-        <label>Gemini (aistudio.google.com)</label>
-        <input type="password" id="key-gemini" placeholder="AIza..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>Groq (console.groq.com)</label>
-        <input type="password" id="key-groq" placeholder="gsk_..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>Cerebras (cerebras.ai)</label>
-        <input type="password" id="key-cerebras" placeholder="csk_..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>OpenRouter (openrouter.ai)</label>
-        <input type="password" id="key-openrouter" placeholder="sk-or-v1-..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>Cohere (cohere.com)</label>
-        <input type="password" id="key-cohere" placeholder="..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>Mistral (console.mistral.ai)</label>
-        <input type="password" id="key-mistral" placeholder="..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>HuggingFace (huggingface.co)</label>
-        <input type="password" id="key-hf" placeholder="hf_..." oninput="saveKeys()">
-      </div>
-      <div class="config-item">
-        <label>Together AI (api.together.ai)</label>
-        <input type="password" id="key-together" placeholder="..." oninput="saveKeys()">
-      </div>
-    </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--text2)">
-      💡 Add at least 1 key to get started. More keys = better uptime via auto-fallback. All free tiers, no credit card needed.
-    </div>
-  </div>
-
-  <!-- PROVIDER STATUS STRIP -->
-  <div class="provider-strip" id="provider-strip">
-    <div class="provider-pill" id="pill-gemini"><span class="dot"></span>Gemini</div>
-    <div class="provider-pill" id="pill-groq"><span class="dot"></span>Groq</div>
-    <div class="provider-pill" id="pill-cerebras"><span class="dot"></span>Cerebras</div>
-    <div class="provider-pill" id="pill-openrouter"><span class="dot"></span>OpenRouter</div>
-    <div class="provider-pill" id="pill-cohere"><span class="dot"></span>Cohere</div>
-    <div class="provider-pill" id="pill-mistral"><span class="dot"></span>Mistral</div>
-    <div class="provider-pill" id="pill-hf"><span class="dot"></span>HuggingFace</div>
-    <div class="provider-pill" id="pill-together"><span class="dot"></span>Together AI</div>
-  </div>
-
-  <!-- NAV -->
-  <div class="nav">
-    <button class="nav-btn active" onclick="switchTab('chat',this)"><span class="icon">💬</span>Chat</button>
-    <button class="nav-btn" onclick="switchTab('translate',this)"><span class="icon">🌐</span>Translate</button>
-    <button class="nav-btn" onclick="switchTab('search',this)"><span class="icon">🔍</span>Search</button>
-    <button class="nav-btn" onclick="switchTab('research',this)"><span class="icon">🔬</span>Research</button>
-    <button class="nav-btn" onclick="switchTab('image',this)"><span class="icon">🎨</span>Image</button>
-    <button class="nav-btn" onclick="switchTab('ppt',this)"><span class="icon">📊</span>PPT</button>
-    <button class="nav-btn" onclick="switchTab('book',this)"><span class="icon">📚</span>Book</button>
-    <button class="nav-btn" onclick="switchTab('detect',this)"><span class="icon">🔤</span>Detect</button>
-  </div>
-
-  <!-- ===== CHAT ===== -->
-  <div id="panel-chat" class="panel active">
+  <!-- KEYS LOADED BANNER -->
+  <div class="keys-loaded-banner">
+    <div class="icon">✅</div>
     <div>
-      <label>Mode</label>
-      <div class="chip-row">
-        <button class="chip active" onclick="setChip(this,'chatMode','normal')">Normal</button>
-        <button class="chip" onclick="setChip(this,'chatMode','indepth')">In-Depth</button>
-        <button class="chip" onclick="setChip(this,'chatMode','core')">Core Matter</button>
+      <strong>6 of 8 API Keys Pre-Loaded</strong><br>
+      <span style="color:var(--text2);font-size:12px;">Gemini · Groq · Cerebras · OpenRouter · Cohere · Mistral are configured. Add HuggingFace &amp; Together AI to complete the setup.</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Free Providers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">20K+</div>
+      <div class="stat-label">Req / Day Free</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">₹0</div>
+      <div class="stat-label">Total Cost</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">~20m</div>
+      <div class="stat-label">Setup Time</div>
+    </div>
+  </div>
+
+  <!-- ADMIN CHECKLIST -->
+  <div class="section-head">
+    <h2>📋 Admin Checklist</h2>
+    <div class="section-line"></div>
+    <div class="section-tag">track your progress</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>Setup Progress</span>
+      <span id="progress-text">0 / 12 tasks done</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="checklist" id="checklist">
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Groq (highest free limit — do this first)
+        <div class="sub">✅ Key configured: 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</div>
       </div>
     </div>
-    <div><label>Your message</label><textarea id="chat-input" rows="4" placeholder="Ask me anything... (Ctrl+Enter to send)"></textarea></div>
-    <div><button class="btn" id="chat-btn" onclick="runChat()">▶ Send</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="chat-out">Response appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('chat-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('chat-out')">✕ Clear</button>
-        <div class="provider-used" id="chat-provider"></div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Google Gemini
+        <div class="sub">✅ Key configured: AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Together AI
+        <div class="sub">⚠ Not yet configured — api.together.ai → Settings → API Keys</div>
+      </div>
+    </div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for OpenRouter
+        <div class="sub">✅ Key configured: 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</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for HuggingFace
+        <div class="sub">⚠ Not yet configured — huggingface.co → Settings → Access Tokens → New Token</div>
+      </div>
+    </div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Cerebras
+        <div class="sub">✅ Key configured: csk-vx8k9xkp3j65tjxwc5rpwydrdjkj56d943fwjn6f3wc5t58y</div>
+      </div>
+    </div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Cohere
+        <div class="sub">✅ Trial key configured: m170vTi3BI1gBLkmcUDIhlYmM3AYfJNimZ6yXdqZ</div>
+      </div>
+    </div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Sign up for Mistral AI
+        <div class="sub">✅ Key configured: b0a6d206-2c16-422f-af4c-6f4a2ff542ca</div>
+      </div>
+    </div>
+    <div class="check-item done" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Paste all 8 keys into server.js PROVIDER_KEYS section
+        <div class="sub">✅ 6 keys pre-filled in Server Configuration section below. Add HF + Together when ready.</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Run <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">cd server && npm install</code>
+        <div class="sub">Installs express, cors, node-fetch, uuid</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Start the server with <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">node server.js</code>
+        <div class="sub">Should print "6 providers configured" in terminal</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box">✓</div>
+      <div class="check-text">Open public/index.html and verify green "Server online" banner
+        <div class="sub">All provider pills should turn green. Test a query.</div>
       </div>
     </div>
   </div>
 
-  <!-- ===== TRANSLATE ===== -->
-  <div id="panel-translate" class="panel">
-    <div class="row2">
-      <div><label>From language</label><select id="lang-from"><option value="Auto-detect">Auto-detect</option></select></div>
-      <div><label>To language</label><select id="lang-to"></select></div>
-    </div>
-    <div><label>Text to translate</label><textarea id="translate-input" rows="4" placeholder="Enter text to translate..."></textarea></div>
-    <div><button class="btn" id="translate-btn" onclick="runTranslate()">🌐 Translate</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="translate-out">Translation appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('translate-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('translate-out')">✕ Clear</button>
-        <div class="provider-used" id="translate-provider"></div>
+  <!-- PROVIDER GUIDES -->
+  <div class="section-head">
+    <h2>🔑 Provider Registration — Step by Step</h2>
+    <div class="section-line"></div>
+    <div class="section-tag">click each to expand</div>
+  </div>
+
+  <div class="providers-grid">
+
+    <!-- GROQ -->
+    <div class="provider-card" id="card-groq">
+      <div class="provider-header" onclick="toggleCard('groq')">
+        <div class="provider-icon" style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.2);">⚡</div>
+        <div class="provider-meta">
+          <div class="provider-name">Groq</div>
+          <div class="provider-url">console.groq.com</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">14,400 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
       </div>
+      <div class="provider-body">
+        <div class="note-box"><strong>⭐ Start here.</strong> Groq is the fastest, most generous free provider. 14,400 requests/day — enough to power your app solo. Ultra-low latency responses.</div>
+        <div class="key-live">🔑 <span class="key-label">Your active key:</span> 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</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Open Groq Console</div>
+              <div class="step-desc">Go to <a href="https://console.groq.com" target="_blank">console.groq.com</a> in your browser. Click <code>Sign Up</code> in the top right corner.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Create your account</div>
+              <div class="step-desc">Sign up with Google or email. No credit card required. Verify your email if prompted.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Navigate to API Keys</div>
+              <div class="step-desc">Once logged in, click <code>API Keys</code> in the left sidebar. Then click <code>Create API Key</code> button.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Name and copy your key</div>
+              <div class="step-desc">Name it <code>omniai-server</code>. Click Create. <strong>Copy the key immediately</strong> — it starts with <code>gsk_</code> and is only shown once.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">Paste into server.js</div>
+              <div class="step-desc">Open <code>server/server.js</code>. Find <code>groq: ''</code> inside PROVIDER_KEYS. Paste your key between the quotes.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- GEMINI -->
+    <div class="provider-card" id="card-gemini">
+      <div class="provider-header" onclick="toggleCard('gemini')">
+        <div class="provider-icon" style="background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.2);">🔷</div>
+        <div class="provider-meta">
+          <div class="provider-name">Google Gemini</div>
+          <div class="provider-url">aistudio.google.com</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">1,500 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="key-live">🔑 <span class="key-label">Your active key:</span> AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Open Google AI Studio</div>
+              <div class="step-desc">Go to <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>. Sign in with your Google account.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Get API Key</div>
+              <div class="step-desc">Click <code>Get API Key</code> button (top left area or header). Then click <code>Create API key in new project</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy the generated key. Open <code>server/server.js</code> and paste it into <code>gemini: ''</code> inside PROVIDER_KEYS.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>AIzaSy_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- TOGETHER AI -->
+    <div class="provider-card" id="card-together">
+      <div class="provider-header" onclick="toggleCard('together')">
+        <div class="provider-icon" style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.2);">🤝</div>
+        <div class="provider-meta">
+          <div class="provider-name">Together AI</div>
+          <div class="provider-url">api.together.ai</div>
+        </div>
+        <div class="provider-right">
+          <span class="free-badge">⚠ Not Yet Set Up</span>
+          <span class="limit-badge">~1,000 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="note-box"><strong>Action needed:</strong> This provider is not yet configured. Follow the steps below to get your free key.</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Sign up at Together AI</div>
+              <div class="step-desc">Go to <a href="https://api.together.ai" target="_blank">api.together.ai</a>. Click <code>Get Started</code>. Sign up with Google or email.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Go to API Keys</div>
+              <div class="step-desc">After login, click your profile icon → <code>Settings</code> → <code>API Keys</code>. Click <code>Create new key</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy the key and paste it into <code>together: ''</code> in server.js PROVIDER_KEYS.</div>
+            </div>
+          </div>
+        </div>
+        <div class="note-box"><strong>Note:</strong> Together AI uses Llama-3.3-70B-Instruct-Turbo-Free — a very capable free model with no credit card required.</div>
+        <div class="key-format">🔑 Key format: <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- OPENROUTER -->
+    <div class="provider-card" id="card-openrouter">
+      <div class="provider-header" onclick="toggleCard('openrouter')">
+        <div class="provider-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">🛣️</div>
+        <div class="provider-meta">
+          <div class="provider-name">OpenRouter</div>
+          <div class="provider-url">openrouter.ai</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">~200 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="key-live">🔑 <span class="key-label">Your active key:</span> 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</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Sign up at OpenRouter</div>
+              <div class="step-desc">Go to <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>. Click <code>Sign In</code> → <code>Create account</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Create an API Key</div>
+              <div class="step-desc">Go to <code>Keys</code> section in the dashboard. Click <code>Create Key</code>. Name it <code>omniai</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Set credit limit to $0</div>
+              <div class="step-desc">When creating the key, set the credit limit to <code>$0</code> so it only uses free models — this prevents any accidental charges.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy key and paste into <code>openrouter: ''</code> in server.js.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- HUGGINGFACE -->
+    <div class="provider-card" id="card-hf">
+      <div class="provider-header" onclick="toggleCard('hf')">
+        <div class="provider-icon" style="background:rgba(255,196,0,0.12);border:1px solid rgba(255,196,0,0.2);">🤗</div>
+        <div class="provider-meta">
+          <div class="provider-name">HuggingFace</div>
+          <div class="provider-url">huggingface.co</div>
+        </div>
+        <div class="provider-right">
+          <span class="free-badge">⚠ Not Yet Set Up</span>
+          <span class="limit-badge">~500 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="note-box"><strong>Action needed:</strong> This provider is not yet configured. Also required for image generation via FLUX.</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Create HuggingFace account</div>
+              <div class="step-desc">Go to <a href="https://huggingface.co/join" target="_blank">huggingface.co/join</a>. Fill in username, email, password. Verify email.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Go to Access Tokens</div>
+              <div class="step-desc">Click your profile photo → <code>Settings</code> → <code>Access Tokens</code> in the left menu.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Create new token</div>
+              <div class="step-desc">Click <code>New token</code>. Name it <code>omniai</code>. Select role: <code>Read</code>. Click <code>Generate a token</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy the token (starts with <code>hf_</code>). Paste into <code>hf: ''</code> in server.js.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- CEREBRAS -->
+    <div class="provider-card" id="card-cerebras">
+      <div class="provider-header" onclick="toggleCard('cerebras')">
+        <div class="provider-icon" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);">🧠</div>
+        <div class="provider-meta">
+          <div class="provider-name">Cerebras</div>
+          <div class="provider-url">cerebras.ai</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">~1,000 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="key-live">🔑 <span class="key-label">Your active key:</span> csk-vx8k9xkp3j65tjxwc5rpwydrdjkj56d943fwjn6f3wc5t58y</div>
+        <div class="note-box"><strong>Bonus key available:</strong> You also have a second Cerebras key: <code style="color:#f0c060">csk-hjm4ptf8fmx32fxjk5nryjt6jjp2pj5f29pn53ktt3h4ewpd</code> — you can use it as a backup.</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Sign up at Cerebras</div>
+              <div class="step-desc">Go to <a href="https://cerebras.ai" target="_blank">cerebras.ai</a>. Click <code>Get Started</code> or <code>Developer</code>. Create a free account.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Navigate to API Keys</div>
+              <div class="step-desc">In your dashboard, find <code>API Keys</code> section. Click <code>Create new API key</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy the key (starts with <code>csk_</code>). Paste into <code>cerebras: ''</code> in server.js.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>csk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- COHERE -->
+    <div class="provider-card" id="card-cohere">
+      <div class="provider-header" onclick="toggleCard('cohere')">
+        <div class="provider-icon" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);">🌊</div>
+        <div class="provider-meta">
+          <div class="provider-name">Cohere</div>
+          <div class="provider-url">cohere.com</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">1,000 req/month</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="key-live">🔑 <span class="key-label">Your active key (trial):</span> m170vTi3BI1gBLkmcUDIhlYmM3AYfJNimZ6yXdqZ</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Sign up at Cohere</div>
+              <div class="step-desc">Go to <a href="https://cohere.com" target="_blank">cohere.com</a>. Click <code>Start for free</code>. Register with email or Google.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Get Trial API Key</div>
+              <div class="step-desc">In your dashboard, click <code>API Keys</code>. You'll see a <code>Trial key</code> already generated. Copy it. No credit card needed.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Paste into server.js</div>
+              <div class="step-desc">Paste the key into <code>cohere: ''</code> in server.js PROVIDER_KEYS.</div>
+            </div>
+          </div>
+        </div>
+        <div class="note-box"><strong>Note:</strong> Cohere trial keys work immediately with no credit card. The 1,000/month limit resets each month — good as a backup provider.</div>
+        <div class="key-format">🔑 Key format: <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+    <!-- MISTRAL -->
+    <div class="provider-card" id="card-mistral">
+      <div class="provider-header" onclick="toggleCard('mistral')">
+        <div class="provider-icon" style="background:rgba(251,146,60,0.12);border:1px solid rgba(251,146,60,0.2);">🌪️</div>
+        <div class="provider-meta">
+          <div class="provider-name">Mistral AI</div>
+          <div class="provider-url">console.mistral.ai</div>
+        </div>
+        <div class="provider-right">
+          <span class="configured-badge">✓ Configured</span>
+          <span class="limit-badge">~500 req/day</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="provider-body">
+        <div class="key-live">🔑 <span class="key-label">Your active key:</span> b0a6d206-2c16-422f-af4c-6f4a2ff542ca</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Open Mistral Console</div>
+              <div class="step-desc">Go to <a href="https://console.mistral.ai" target="_blank">console.mistral.ai</a>. Click <code>Sign up</code>. Register with email.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Verify and log in</div>
+              <div class="step-desc">Check email for verification link. Click it, then log in to the console.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Create API Key</div>
+              <div class="step-desc">Go to <code>API Keys</code> in the left sidebar. Click <code>Create new key</code>. Name it <code>omniai</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Copy and paste</div>
+              <div class="step-desc">Copy the key immediately — shown only once. Paste into <code>mistral: ''</code> in server.js.</div>
+            </div>
+          </div>
+        </div>
+        <div class="key-format">🔑 Key format: <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></div>
+      </div>
+    </div>
+
+  </div><!-- end providers-grid -->
+
+  <!-- SERVER CONFIGURATION -->
+  <div class="section-head">
+    <h2>⚙ Server Configuration</h2>
+    <div class="section-line"></div>
+    <div class="section-tag">server/server.js</div>
+  </div>
+
+  <div class="server-setup">
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('direct')">Direct in server.js</button>
+      <button class="tab" onclick="switchTab('envvar')">Environment Variables</button>
+      <button class="tab" onclick="switchTab('envfile')">Using .env file</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-direct">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Open <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">server/server.js</code> — copy this ready-to-use block with your keys pre-filled:</p>
+      <div class="code-block" id="code-direct">
+<span class="comment">// server/server.js — PROVIDER_KEYS (your keys pre-filled)</span>
+<span class="key-name">const</span> PROVIDER_KEYS = {
+  <span class="key-name">gemini</span>:     <span class="key-val">'AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo'</span>,
+  <span class="key-name">groq</span>:       <span class="key-val">'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'</span>,
+  <span class="key-name">cerebras</span>:   <span class="key-val">'csk-vx8k9xkp3j65tjxwc5rpwydrdjkj56d943fwjn6f3wc5t58y'</span>,
+  <span class="key-name">openrouter</span>: <span class="key-val">'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'</span>,
+  <span class="key-name">cohere</span>:     <span class="key-val">'m170vTi3BI1gBLkmcUDIhlYmM3AYfJNimZ6yXdqZ'</span>,
+  <span class="key-name">mistral</span>:    <span class="key-val">'b0a6d206-2c16-422f-af4c-6f4a2ff542ca'</span>,
+  <span class="key-name">hf</span>:         <span class="key-val">''</span>, <span class="comment">// ← add your HuggingFace token here (hf_...)</span>
+  <span class="key-name">together</span>:   <span class="key-val">''</span>, <span class="comment">// ← add your Together AI key here</span>
+};
+        <button class="copy-btn" onclick="copyCode('code-direct')">Copy</button>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;">Then run: <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">node server.js</code></p>
+    </div>
+
+    <div class="tab-panel" id="tab-envvar">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Pass keys as environment variables — safer since keys aren't saved in code:</p>
+      <div class="code-block" id="code-env">
+<span class="comment"># Windows (Command Prompt)</span>
+<span class="cmd">set</span> GEMINI_KEY=AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo && <span class="cmd">set</span> GROQ_KEY=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 && <span class="cmd">node</span> server.js
+
+<span class="comment"># Mac / Linux / Git Bash</span>
+<span class="cmd">GEMINI_KEY</span>=AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo \
+<span class="cmd">GROQ_KEY</span>=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 \
+<span class="cmd">CEREBRAS_KEY</span>=csk-vx8k9xkp3j65tjxwc5rpwydrdjkj56d943fwjn6f3wc5t58y \
+<span class="cmd">OPENROUTER_KEY</span>=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 \
+<span class="cmd">COHERE_KEY</span>=m170vTi3BI1gBLkmcUDIhlYmM3AYfJNimZ6yXdqZ \
+<span class="cmd">MISTRAL_KEY</span>=b0a6d206-2c16-422f-af4c-6f4a2ff542ca \
+<span class="cmd">HF_KEY</span>=YOUR_HF_TOKEN_HERE \
+<span class="cmd">TOGETHER_KEY</span>=YOUR_TOGETHER_KEY_HERE \
+<span class="cmd">node</span> server.js
+        <button class="copy-btn" onclick="copyCode('code-env')">Copy</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-envfile">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Create a file called <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">.env</code> in the server/ folder:</p>
+      <div class="env-template" id="code-envfile">
+        <div class="env-line"><span class="env-key">GEMINI_KEY</span><span class="env-eq">=</span><span class="env-val">AIzaSyD7Wax8isGytBCThr10svbi44Ch-MhyyAo</span><span class="env-comment"># aistudio.google.com</span></div>
+        <div class="env-line"><span class="env-key">GROQ_KEY</span><span class="env-eq">=</span><span class="env-val">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</span><span class="env-comment"># console.groq.com</span></div>
+        <div class="env-line"><span class="env-key">CEREBRAS_KEY</span><span class="env-eq">=</span><span class="env-val">csk-vx8k9xkp3j65tjxwc5rpwydrdjkj56d943fwjn6f3wc5t58y</span><span class="env-comment"># cerebras.ai</span></div>
+        <div class="env-line"><span class="env-key">OPENROUTER_KEY</span><span class="env-eq">=</span><span class="env-val">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</span><span class="env-comment"># openrouter.ai</span></div>
+        <div class="env-line"><span class="env-key">COHERE_KEY</span><span class="env-eq">=</span><span class="env-val">m170vTi3BI1gBLkmcUDIhlYmM3AYfJNimZ6yXdqZ</span><span class="env-comment"># cohere.com (trial)</span></div>
+        <div class="env-line"><span class="env-key">MISTRAL_KEY</span><span class="env-eq">=</span><span class="env-val">b0a6d206-2c16-422f-af4c-6f4a2ff542ca</span><span class="env-comment"># console.mistral.ai</span></div>
+        <div class="env-line"><span class="env-key">HF_KEY</span><span class="env-eq">=</span><span class="env-val">hf_YOUR_TOKEN_HERE</span><span class="env-comment"># huggingface.co — not set yet</span></div>
+        <div class="env-line"><span class="env-key">TOGETHER_KEY</span><span class="env-eq">=</span><span class="env-val">YOUR_TOGETHER_KEY_HERE</span><span class="env-comment"># api.together.ai — not set yet</span></div>
+        <button class="copy-btn" onclick="copyCode('code-envfile')">Copy</button>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-top:8px;">Install dotenv: <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">npm install dotenv</code> then add <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">require('dotenv').config()</code> at the top of server.js. Add <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">.env</code> to your <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 6px;border-radius:3px;font-family:monospace">.gitignore</code> so keys never go to GitHub.</p>
     </div>
   </div>
 
-  <!-- ===== SEARCH ===== -->
-  <div id="panel-search" class="panel">
-    <div>
-      <label>Search type</label>
-      <div class="chip-row">
-        <button class="chip active" onclick="setChip(this,'searchMode','word')">Word / Definition</button>
-        <button class="chip" onclick="setChip(this,'searchMode','topic')">Topic Overview</button>
-        <button class="chip" onclick="setChip(this,'searchMode','indepth')">In-Depth</button>
-        <button class="chip" onclick="setChip(this,'searchMode','core')">Core Insights</button>
-      </div>
-    </div>
-    <div><label>Search query</label><input type="text" id="search-input" placeholder="Enter your search query..."></div>
-    <div><button class="btn" id="search-btn" onclick="runSearch()">🔍 Search</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="search-out">Results appear here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('search-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('search-out')">✕ Clear</button>
-        <div class="provider-used" id="search-provider"></div>
-      </div>
-    </div>
+  <!-- ROTATION DIAGRAM -->
+  <div class="section-head">
+    <h2>🎲 How Rotation Works</h2>
+    <div class="section-line"></div>
+    <div class="section-tag">auto-fallback flow</div>
   </div>
 
-  <!-- ===== RESEARCH ===== -->
-  <div id="panel-research" class="panel">
-    <div>
-      <label>Report type</label>
-      <div class="chip-row">
-        <button class="chip active" onclick="setChip(this,'researchMode','standard')">Standard</button>
-        <button class="chip" onclick="setChip(this,'researchMode','academic')">Academic</button>
-        <button class="chip" onclick="setChip(this,'researchMode','exhaustive')">Exhaustive</button>
-      </div>
+  <div class="rotation-diagram">
+    <p style="font-size:13px;color:var(--text2);">Every search request randomly shuffles the provider order. If one fails or is rate-limited, it automatically moves to the next — <strong style="color:var(--text)">user never sees an error.</strong></p>
+    <div class="rotation-flow" style="margin-top:1rem;">
+      <div class="flow-node active">Request In</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🎲 Shuffle</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">Try Groq</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fallback">✓ Success → Return</div>
     </div>
-    <div><label>Research topic</label><textarea id="research-input" rows="3" placeholder="Enter topic for research report..."></textarea></div>
-    <div><button class="btn" id="research-btn" onclick="runResearch()">🔬 Generate Report</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="research-out">Report appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('research-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('research-out')">✕ Clear</button>
-        <div class="provider-used" id="research-provider"></div>
-      </div>
+    <div class="rotation-flow">
+      <div class="flow-node" style="opacity:0.3">Request In</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🎲 Shuffle</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--red);color:var(--red)">Groq limit hit</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">Try Gemini</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fallback">✓ Success</div>
     </div>
+    <div class="rotation-flow">
+      <div class="flow-node" style="opacity:0.3">Request In</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🎲 Shuffle</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--red);color:var(--red);font-size:11px">Groq + Gemini down</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active">Try Cerebras</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node fallback">✓ Success</div>
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin-top:12px;">With 6 configured providers + 2 to add, totalling 20,000+ free requests/day, the app stays online even if multiple providers are down simultaneously.</p>
   </div>
 
-  <!-- ===== IMAGE ===== -->
-  <div id="panel-image" class="panel">
-    <div>
-      <label>Image style</label>
-      <div class="chip-row">
-        <button class="chip active" onclick="setChip(this,'imageStyle','photorealistic')">Photorealistic</button>
-        <button class="chip" onclick="setChip(this,'imageStyle','digital art')">Digital Art</button>
-        <button class="chip" onclick="setChip(this,'imageStyle','oil painting')">Oil Painting</button>
-        <button class="chip" onclick="setChip(this,'imageStyle','anime')">Anime</button>
-        <button class="chip" onclick="setChip(this,'imageStyle','sketch')">Sketch</button>
-        <button class="chip" onclick="setChip(this,'imageStyle','3D render')">3D Render</button>
-      </div>
-    </div>
-    <div><label>Describe your image</label><textarea id="image-input" rows="3" placeholder="e.g. A serene Japanese garden at sunset with cherry blossoms..."></textarea></div>
-    <div><button class="btn" id="image-btn" onclick="runImage()">✨ Enhance Prompt + Generate via HuggingFace</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="image-out">Enhanced prompt and generation instructions appear here...</div>
-      <div id="image-display" style="margin-top:10px;"></div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('image-out')">📋 Copy Prompt</button>
-        <button class="btn-sm" onclick="clearOut('image-out')">✕ Clear</button>
-        <div class="provider-used" id="image-provider"></div>
-      </div>
-    </div>
+  <!-- FOOTER -->
+  <div class="admin-footer">
+    <strong>OmniAI Secure Edition</strong> — Admin Setup Guide<br>
+    6 of 8 providers configured · 2 remaining (HuggingFace, Together AI) · ₹0 total cost<br>
+    <span style="font-size:11px;color:var(--text3);">Keep this page bookmarked. Open admin-guide.html anytime as your reference.</span>
   </div>
 
-  <!-- ===== PPT ===== -->
-  <div id="panel-ppt" class="panel">
-    <div><label>Presentation topic</label><input type="text" id="ppt-topic" placeholder="e.g. The Future of Renewable Energy in India"></div>
-    <div class="row3">
-      <div><label>Slides</label><select id="ppt-slides"><option>5</option><option>8</option><option selected>10</option><option>15</option><option>20</option></select></div>
-      <div><label>Audience</label><select id="ppt-audience"><option>General</option><option>Business</option><option>Academic</option><option>Technical</option><option>Students</option></select></div>
-      <div><label>Tone</label><select id="ppt-tone"><option>Professional</option><option>Casual</option><option>Inspiring</option><option>Data-driven</option></select></div>
-    </div>
-    <div><button class="btn" id="ppt-btn" onclick="runPPT()">📊 Create Outline</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="ppt-out">PPT outline with speaker notes appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('ppt-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('ppt-out')">✕ Clear</button>
-        <div class="provider-used" id="ppt-provider"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== BOOK ===== -->
-  <div id="panel-book" class="panel">
-    <div><label>Book title / concept</label><input type="text" id="book-title" placeholder="e.g. The Last Algorithm — a sci-fi thriller about rogue AI"></div>
-    <div class="row2">
-      <div><label>Genre</label><select id="book-genre"><option>Fiction</option><option>Sci-Fi</option><option>Fantasy</option><option>Mystery / Thriller</option><option>Romance</option><option>Horror</option><option>Non-Fiction</option><option>Self-Help</option><option>Biography</option></select></div>
-      <div><label>Action</label>
-        <select id="book-action">
-          <option value="outline">Full chapter outline</option>
-          <option value="ch1">Write Chapter 1</option>
-          <option value="next">Write next chapter</option>
-          <option value="synopsis">Back-cover synopsis</option>
-          <option value="characters">Character profiles</option>
-        </select>
-      </div>
-    </div>
-    <div><label>Context / notes (optional — paste previous chapter or ideas)</label>
-      <textarea id="book-context" rows="3" placeholder="Paste previous content or story notes here..."></textarea>
-    </div>
-    <div><button class="btn" id="book-btn" onclick="runBook()">📚 Generate</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="book-out">Book content appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('book-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('book-out')">✕ Clear</button>
-        <div class="provider-used" id="book-provider"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DETECT ===== -->
-  <div id="panel-detect" class="panel">
-    <div><label>Text sample</label><textarea id="detect-input" rows="5" placeholder="Paste any text here to detect its language..."></textarea></div>
-    <div><button class="btn" id="detect-btn" onclick="runDetect()">🔤 Detect Language</button></div>
-    <div class="output-wrap">
-      <div class="output-box empty" id="detect-out">Detection result appears here...</div>
-      <div class="output-actions">
-        <button class="btn-sm" onclick="copyOut('detect-out')">📋 Copy</button>
-        <button class="btn-sm" onclick="clearOut('detect-out')">✕ Clear</button>
-        <div class="provider-used" id="detect-provider"></div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- end app-wrap -->
+</div>
 
 <script>
-/* ============================================================
-   OMNIAI ENGINE — PASTE THIS <script> INTO ANY HTML PAGE
-   ============================================================
-   SETUP: Enter your free API keys below OR use the ⚙ button
-   in the UI. Keys are saved to localStorage automatically.
-   
-   GET FREE KEYS:
-   • Gemini    → https://aistudio.google.com
-   • Groq      → https://console.groq.com
-   • Cerebras  → https://cerebras.ai
-   • OpenRouter→ https://openrouter.ai
-   • Cohere    → https://cohere.com/dashboard
-   • Mistral   → https://console.mistral.ai
-   • HuggingFace→ https://huggingface.co/settings/tokens
-   • Together  → https://api.together.ai
-   ============================================================ */
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('open');
+}
 
-// ── OPTIONAL: hardcode keys here so you never need to type them ──
-const HARDCODED_KEYS = {
-  gemini:      '',   // AIza...
-  groq:        '',   // gsk_...
-  cerebras:    '',   // csk_...
-  openrouter:  '',   // sk-or-v1-...
-  cohere:      '',   // ...
-  mistral:     '',   // ...
-  hf:          '',   // hf_...
-  together:    '',   // ...
-};
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + id + "'")) t.classList.add('active');
+  });
+}
 
-// ── STATE ──
-const state = {
-  chatMode: 'normal',
-  searchMode: 'word',
-  researchMode: 'standard',
-  imageStyle: 'photorealistic'
-};
+function toggleCheck(el) {
+  el.classList.toggle('done');
+  updateProgress();
+  saveProgress();
+}
 
-// ── PROVIDER DEFINITIONS ──
-// Order = fallback priority. First available key wins, then falls through.
-function getProviders() {
-  const K = getKeys();
-  return [
-    {
-      id: 'gemini',
-      name: 'Gemini',
-      available: !!K.gemini,
-      call: async (system, user) => {
-        const r = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${K.gemini}`,
-          { method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ contents:[{parts:[{text: system+'\n\n'+user}]}] }) }
-        );
-        if(!r.ok) throw new Error(`Gemini ${r.status}`);
-        const d = await r.json();
-        return d.candidates[0].content.parts[0].text;
-      }
-    },
-    {
-      id: 'groq',
-      name: 'Groq',
-      available: !!K.groq,
-      call: async (system, user) => {
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.groq}`},
-            body: JSON.stringify({ model:'llama-3.3-70b-versatile', max_tokens:2048,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`Groq ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
-    },
-    {
-      id: 'cerebras',
-      name: 'Cerebras',
-      available: !!K.cerebras,
-      call: async (system, user) => {
-        const r = await fetch('https://api.cerebras.ai/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.cerebras}`},
-            body: JSON.stringify({ model:'llama3.1-70b', max_tokens:2048,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`Cerebras ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
-    },
-    {
-      id: 'openrouter',
-      name: 'OpenRouter',
-      available: !!K.openrouter,
-      call: async (system, user) => {
-        const r = await fetch('https://openrouter.ai/api/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.openrouter}`,
-              'HTTP-Referer':'https://omniai.app','X-Title':'OmniAI'},
-            body: JSON.stringify({ model:'mistralai/mistral-7b-instruct:free', max_tokens:2048,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`OpenRouter ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
-    },
-    {
-      id: 'cohere',
-      name: 'Cohere',
-      available: !!K.cohere,
-      call: async (system, user) => {
-        const r = await fetch('https://api.cohere.com/v2/chat',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.cohere}`},
-            body: JSON.stringify({ model:'command-r', max_tokens:2048,
-              system_prompt: system,
-              messages:[{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`Cohere ${r.status}`);
-        const d = await r.json();
-        return d.message.content[0].text;
-      }
-    },
-    {
-      id: 'mistral',
-      name: 'Mistral',
-      available: !!K.mistral,
-      call: async (system, user) => {
-        const r = await fetch('https://api.mistral.ai/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.mistral}`},
-            body: JSON.stringify({ model:'mistral-small-latest', max_tokens:2048,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`Mistral ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
-    },
-    {
-      id: 'hf',
-      name: 'HuggingFace',
-      available: !!K.hf,
-      call: async (system, user) => {
-        const r = await fetch('https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.hf}`},
-            body: JSON.stringify({ max_tokens:1500,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`HuggingFace ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
-    },
-    {
-      id: 'together',
-      name: 'Together AI',
-      available: !!K.together,
-      call: async (system, user) => {
-        const r = await fetch('https://api.together.xyz/v1/chat/completions',
-          { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${K.together}`},
-            body: JSON.stringify({ model:'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free', max_tokens:2048,
-              messages:[{role:'system',content:system},{role:'user',content:user}] }) }
-        );
-        if(!r.ok) throw new Error(`Together ${r.status}`);
-        const d = await r.json();
-        return d.choices[0].message.content;
-      }
+function updateProgress() {
+  const items = document.querySelectorAll('.check-item');
+  const done = document.querySelectorAll('.check-item.done').length;
+  const total = items.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${total} tasks done`;
+}
+
+function saveProgress() {
+  const states = [];
+  document.querySelectorAll('.check-item').forEach(el => states.push(el.classList.contains('done')));
+  try { localStorage.setItem('omniai_admin_progress', JSON.stringify(states)); } catch(e) {}
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem('omniai_admin_progress');
+    if (saved) {
+      const states = JSON.parse(saved);
+      const items = document.querySelectorAll('.check-item');
+      states.forEach((done, i) => { if (done && items[i]) items[i].classList.add('done'); });
     }
-  ];
+    updateProgress();
+  } catch(e) { updateProgress(); }
 }
 
-// ── KEY MANAGEMENT ──
-function getKeys() {
-  const saved = JSON.parse(localStorage.getItem('omniai_keys') || '{}');
-  const merged = {};
-  ['gemini','groq','cerebras','openrouter','cohere','mistral','hf','together'].forEach(k => {
-    merged[k] = HARDCODED_KEYS[k] || saved[k] || '';
-  });
-  return merged;
-}
-
-function saveKeys() {
-  const keys = {};
-  ['gemini','groq','cerebras','openrouter','cohere','mistral','hf','together'].forEach(k => {
-    const el = document.getElementById('key-'+k);
-    if(el) keys[k] = el.value.trim();
-  });
-  localStorage.setItem('omniai_keys', JSON.stringify(keys));
-  updateProviderStrip();
-}
-
-function loadKeysIntoUI() {
-  const K = getKeys();
-  ['gemini','groq','cerebras','openrouter','cohere','mistral','hf','together'].forEach(k => {
-    const el = document.getElementById('key-'+k);
-    if(el && K[k]) el.value = K[k];
-  });
-  updateProviderStrip();
-}
-
-function updateProviderStrip() {
-  const K = getKeys();
-  ['gemini','groq','cerebras','openrouter','cohere','mistral','hf','together'].forEach(k => {
-    const pill = document.getElementById('pill-'+k);
-    if(!pill) return;
-    if(K[k]) pill.classList.add('active');
-    else pill.classList.remove('active');
-  });
-}
-
-// ── CORE AI CALL WITH AUTO-FALLBACK ──
-async function callAI(systemPrompt, userMessage, outId, btnId, providerId) {
-  const providers = getProviders();
-  const available = providers.filter(p => p.available);
-
-  if(available.length === 0) {
-    showResult(outId, '⚠ No API keys found. Click the ⚙ API Keys button above and add at least one free key.', true);
-    return;
-  }
-
-  setLoading(btnId, true);
-  showResult(outId, 'Thinking...', true);
-  document.getElementById(outId).classList.add('loading');
-
-  let lastError = '';
-  for(const provider of available) {
-    setPillActive(provider.id);
-    try {
-      const text = await provider.call(systemPrompt, userMessage);
-      showResult(outId, text, false);
-      document.getElementById(outId).classList.remove('loading');
-      setProviderUsed(providerId, provider.name);
-      setLoading(btnId, false);
-      return;
-    } catch(e) {
-      lastError = e.message;
-      setPillFailed(provider.id);
-      // try next provider
-      await new Promise(r => setTimeout(r, 300));
-    }
-  }
-
-  showResult(outId, `All providers failed. Last error: ${lastError}\n\nTip: Check your API keys or add more providers.`, true);
-  document.getElementById(outId).classList.remove('loading');
-  setLoading(btnId, false);
-}
-
-// ── SYSTEM PROMPTS ──
-const PROMPTS = {
-  chat_normal:   'You are a helpful, friendly AI assistant. Answer clearly and concisely.',
-  chat_indepth:  'You are an expert AI assistant. Provide comprehensive, detailed, well-structured answers with examples, nuances, and deep analysis. Use headers and bullet points for clarity.',
-  chat_core:     'You cut to the core of every question. Skip all preamble. Give only the highest-value insight, tightly formatted with bullet points.',
-
-  translate:     'You are a professional translator. Return ONLY the translated text — no explanations, no labels, just the translation.',
-
-  search_word:   'You are a precision dictionary. Define the term: cover meaning, etymology, usage examples, synonyms, and antonyms.',
-  search_topic:  'You are a knowledge engine. Give a well-organized topic overview: key concepts, history, context, and relevance. Use clear headings.',
-  search_indepth:'You are a deep research engine. Provide a thorough multi-angle analysis: history, mechanisms, expert perspectives, data points, controversies, and future direction.',
-  search_core:   'Extract only the most critical, actionable insights. Format as tight bullet points. No fluff.',
-
-  research_standard:   'Write a structured research report: Executive Summary, Introduction, Key Findings, Analysis, Conclusion.',
-  research_academic:   'Write an academic research report: Abstract, Background, Methodology Notes, Findings, Discussion, Conclusion, References (if known).',
-  research_exhaustive: 'Write an exhaustive, comprehensive research report covering: Historical Background, Current State, Key Debates, Statistics & Data, Expert Opinions, Pros & Cons, Future Outlook, Practical Implications. Be thorough.',
-
-  image_enhance: 'You are a world-class AI image prompt engineer specializing in FLUX model outputs. Enhance the user prompt with precise visual details, lighting conditions, camera angle, color palette, mood, and technical parameters. Then show the enhanced prompt clearly, followed by brief notes on each enhancement.',
-
-  ppt: 'You are an expert presentation designer and public speaker. Create compelling slide outlines with detailed speaker notes.',
-  book: 'You are a bestselling author and creative writing expert. Your writing is vivid, engaging, and hooks readers immediately.',
-  detect: 'You are a computational linguistics expert specializing in language identification.',
-};
-
-// ── FEATURE RUNNERS ──
-function runChat() {
-  const msg = document.getElementById('chat-input').value.trim();
-  if(!msg) return;
-  callAI(PROMPTS['chat_'+state.chatMode], msg, 'chat-out', 'chat-btn', 'chat-provider');
-}
-
-function runTranslate() {
-  const text = document.getElementById('translate-input').value.trim();
-  if(!text) return;
-  const from = document.getElementById('lang-from').value;
-  const to = document.getElementById('lang-to').value;
-  callAI(PROMPTS.translate, `Translate from ${from} to ${to}:\n\n${text}`, 'translate-out', 'translate-btn', 'translate-provider');
-}
-
-function runSearch() {
-  const q = document.getElementById('search-input').value.trim();
-  if(!q) return;
-  callAI(PROMPTS['search_'+state.searchMode], `Query: ${q}`, 'search-out', 'search-btn', 'search-provider');
-}
-
-function runResearch() {
-  const topic = document.getElementById('research-input').value.trim();
-  if(!topic) return;
-  callAI(PROMPTS['research_'+state.researchMode], `Research topic: ${topic}`, 'research-out', 'research-btn', 'research-provider');
-}
-
-async function runImage() {
-  const prompt = document.getElementById('image-input').value.trim();
-  if(!prompt) return;
-  const style = state.imageStyle;
-  const user = `Style: ${style}\nUser prompt: ${prompt}\n\nEnhance this for FLUX image generation. Return:\n1. ENHANCED PROMPT: [your enhanced prompt]\n2. WHAT I ADDED: [brief explanation]`;
-  await callAI(PROMPTS.image_enhance, user, 'image-out', 'image-btn', 'image-provider');
-
-  // Also attempt HuggingFace FLUX image generation if key exists
-  const K = getKeys();
-  if(K.hf) {
-    const display = document.getElementById('image-display');
-    display.innerHTML = '<div style="color:var(--text2);font-size:13px;">🎨 Generating image via HuggingFace FLUX...</div>';
-    try {
-      const enhancedText = document.getElementById('image-out').textContent;
-      const enhancedPrompt = enhancedText.includes('ENHANCED PROMPT:')
-        ? enhancedText.split('ENHANCED PROMPT:')[1].split('\n')[1]
-        : prompt + ', ' + style;
-      const r = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',
-        { method:'POST', headers:{'Authorization':`Bearer ${K.hf}`,'Content-Type':'application/json'},
-          body: JSON.stringify({inputs: enhancedPrompt}) });
-      if(r.ok) {
-        const blob = await r.blob();
-        const url = URL.createObjectURL(blob);
-        display.innerHTML = `<img src="${url}" style="max-width:100%;border-radius:${12}px;margin-top:8px;" alt="Generated image">`;
-      } else {
-        display.innerHTML = '<div style="color:var(--text2);font-size:12px;">Image generation unavailable (model loading). Copy the enhanced prompt and use it at huggingface.co/spaces/black-forest-labs/FLUX.1-schnell</div>';
-      }
-    } catch(e) {
-      display.innerHTML = '';
-    }
-  }
-}
-
-function runPPT() {
-  const topic = document.getElementById('ppt-topic').value.trim();
-  if(!topic) return;
-  const slides = document.getElementById('ppt-slides').value;
-  const audience = document.getElementById('ppt-audience').value;
-  const tone = document.getElementById('ppt-tone').value;
-  const user = `Create a ${slides}-slide ${tone} presentation on: "${topic}"\nTarget audience: ${audience}\n\nFor each slide provide:\n• Slide N: [Title]\n• Key points: 3-4 bullets\n• Speaker notes: 2-3 sentences\n\nEnd with a slide on Q&A and key takeaways.`;
-  callAI(PROMPTS.ppt, user, 'ppt-out', 'ppt-btn', 'ppt-provider');
-}
-
-function runBook() {
-  const title = document.getElementById('book-title').value.trim();
-  if(!title) return;
-  const genre = document.getElementById('book-genre').value;
-  const action = document.getElementById('book-action').value;
-  const context = document.getElementById('book-context').value.trim();
-  const actions = {
-    outline:    'Create a detailed chapter-by-chapter outline. For each chapter: title, 3-sentence summary, key plot/argument points.',
-    ch1:        'Write a compelling, full Chapter 1 (~900 words). Open with a hook. Establish tone, setting, and protagonist immediately.',
-    next:       'Continue from the provided context. Write the next chapter (~900 words), maintaining consistency with the established tone and characters.',
-    synopsis:   'Write a gripping back-cover synopsis (150-200 words) that hooks readers without spoiling the ending.',
-    characters: 'Create detailed character profiles for the main and supporting characters: name, age, background, personality, motivation, flaws, and role in the story.',
-  };
-  const user = `Book: "${title}" | Genre: ${genre}\nTask: ${actions[action]}`
-    + (context ? `\n\nPrevious content / notes:\n${context}` : '');
-  callAI(PROMPTS.book, user, 'book-out', 'book-btn', 'book-provider');
-}
-
-function runDetect() {
-  const text = document.getElementById('detect-input').value.trim();
-  if(!text) return;
-  const user = `Detect the language of this text and provide:\n1. Language name\n2. ISO 639-1 code\n3. Confidence: High / Medium / Low\n4. Identifying features (script, morphology, keywords)\n5. Mixed languages if present\n6. Suggested translation target\n\nText: "${text}"`;
-  callAI(PROMPTS.detect, user, 'detect-out', 'detect-btn', 'detect-provider');
-}
-
-// ── UI HELPERS ──
-function switchTab(tab, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');
-  if(btn) btn.classList.add('active');
-}
-
-function setChip(el, key, val) {
-  state[key] = val;
-  el.closest('.chip-row').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if(!btn) return;
-  if(loading) {
-    btn.setAttribute('data-orig', btn.innerHTML);
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Working...';
-  } else {
-    btn.disabled = false;
-    btn.innerHTML = btn.getAttribute('data-orig') || btn.innerHTML;
-  }
-}
-
-function showResult(id, text, empty) {
+function copyCode(id) {
   const el = document.getElementById(id);
-  if(!el) return;
-  el.textContent = text;
-  el.classList.toggle('empty', !!empty);
+  const text = el.innerText.replace('Copy', '').replace('Copied!', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500); }
+  }).catch(() => {});
 }
 
-function setProviderUsed(id, name) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.innerHTML = `<span class="dot"></span> Answered by ${name}`;
-}
-
-function setPillActive(id) {
-  document.querySelectorAll('.provider-pill').forEach(p => p.style.outline = 'none');
-  const pill = document.getElementById('pill-'+id);
-  if(pill) pill.style.outline = '1px solid var(--accent)';
-}
-
-function setPillFailed(id) {
-  const pill = document.getElementById('pill-'+id);
-  if(pill) { pill.classList.add('failed'); pill.style.outline = 'none'; }
-  setTimeout(() => { if(pill) pill.classList.remove('failed'); }, 3000);
-}
-
-function copyOut(id) {
-  const text = document.getElementById(id)?.textContent || '';
-  navigator.clipboard.writeText(text).catch(() => {});
-}
-
-function clearOut(id) {
-  const el = document.getElementById(id);
-  if(el) { el.textContent = 'Response appears here...'; el.classList.add('empty'); }
-}
-
-function toggleConfig() {
-  document.getElementById('config-panel').classList.toggle('open');
-}
-
-// ── LANGUAGES ──
-const LANGS = ['Afrikaans','Albanian','Amharic','Arabic','Armenian','Azerbaijani','Basque','Bengali','Bosnian','Bulgarian','Catalan','Chinese (Simplified)','Chinese (Traditional)','Croatian','Czech','Danish','Dutch','English','Estonian','Finnish','French','Georgian','German','Greek','Gujarati','Haitian Creole','Hausa','Hebrew','Hindi','Hungarian','Icelandic','Indonesian','Irish','Italian','Japanese','Kannada','Kazakh','Khmer','Korean','Kurdish','Lao','Latin','Latvian','Lithuanian','Macedonian','Malay','Malayalam','Maltese','Marathi','Mongolian','Nepali','Norwegian','Persian','Polish','Portuguese','Punjabi','Romanian','Russian','Serbian','Sinhala','Slovak','Slovenian','Somali','Spanish','Swahili','Swedish','Tamil','Telugu','Thai','Turkish','Ukrainian','Urdu','Uzbek','Vietnamese','Welsh','Xhosa','Yoruba','Zulu'];
-
-function populateLangs() {
-  const from = document.getElementById('lang-from');
-  const to = document.getElementById('lang-to');
-  if(!from || !to) return;
-  LANGS.forEach(l => {
-    from.innerHTML += `<option>${l}</option>`;
-    to.innerHTML += `<option${l==='Telugu'?' selected':''}>${l}</option>`;
-  });
-}
-
-// ── KEYBOARD SHORTCUT ──
-document.addEventListener('keydown', e => {
-  if((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    const active = document.querySelector('.panel.active');
-    if(active) { const btn = active.querySelector('.btn'); if(btn && !btn.disabled) btn.click(); }
-  }
-});
-
-// ── INIT ──
-populateLangs();
-loadKeysIntoUI();
+loadProgress();
+document.getElementById('card-groq').classList.add('open');
 </script>
 </body>
 </html>
